@@ -52,7 +52,11 @@ def get_renamed_file_path(existing_name, string_to_find, string_to_replace,
         if string_to_find != '' and string_to_find in new_name:
             new_name = new_name.replace(string_to_find, string_to_replace)
 
-    new_name = prefix + new_name + suffix
+    if prefix != '':
+        new_name = prefix + new_name
+    if suffix != '':
+        name_only, ext = os.path.splitext(new_name)
+        new_name = name_only + suffix + ext
 
     return new_name
 
@@ -70,8 +74,8 @@ def get_files_with_extension(folder_path, extension):
     if os.path.isdir(folder_path):
         for file_name in os.listdir(folder_path):
             file_path = os.path.join(folder_path, file_name)
-            if (os.path.isfile(file_path) and 
-                    file_name.lower().endswith(extension.lower())):
+            ext = os.path.splitext(file_name)[1]
+            if (os.path.isfile(file_path) and ext == '.' + extension):
                 files_with_extension_arr.append(file_name)
         return files_with_extension_arr
     else:
@@ -95,15 +99,15 @@ def rename_file(logger, existing_name, new_name, copy=False):
         if not os.path.isfile(new_name):
             if copy:
                 shutil.copy(existing_name, new_name)
-                logger.info(f'Copied {existing_name} to {new_name}.')
+                logger.info(f'Copied {existing_name} to {new_name}')
             else:
                 shutil.move(existing_name, new_name)
                 logger.info(f'Renamed {existing_name} to {new_name}')
         else:
-            logger.warning(f'WARNING: {new_name} already exists ',
+            logger.warning(f'{new_name} already exists ' +
                            'and cannot be used as a new file name.')
     else:
-        logger.warning(f'WARNING: File {existing_name} does not exist ', 
+        logger.warning(f'File {existing_name} does not exist, ' + 
                        'thus cannot be renamed.')
 
 def rename_files_in_folder(logger, folder_path, extension, string_to_find,
