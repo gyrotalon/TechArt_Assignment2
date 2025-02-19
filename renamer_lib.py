@@ -1,3 +1,15 @@
+"""
+Filename: renamer_lib.py
+Title: File Renamer Library
+Author: Macy Chantharak
+Date Created: 2025-02-18
+Date Edited: 2025-02-18
+Description:
+    This library contains functions for renaming files.
+Python Version: 3.13
+"""
+
+
 import logger as logger
 import os
 import shutil
@@ -27,26 +39,18 @@ def get_renamed_file_path(existing_name, string_to_find, string_to_replace,
         suffix: a string to append to the end of the file name
     """
 
-    '''
-    REMINDERS
-
-    This function should only take in strings and return a string.  
-    No file renaming/copying/moving should happen here
-
-    Make sure to support string_to_find being an array of multiple strings!  
-        Hint: you may need to check its type...
-    '''
-
     new_name = existing_name
 
     if (isinstance(string_to_find, (list, tuple, set))):
+        if (isinstance(string_to_find, (tuple, set))):
+            string_to_find = list(string_to_find)
         string_to_find.sort(reverse=True)
         for the_string in string_to_find:
-            if the_string != '' and string_to_find in existing_name:
-                new_name = existing_name.replace(the_string, string_to_replace)
+            if the_string != '' and the_string in new_name:
+                new_name = new_name.replace(the_string, string_to_replace)
     else:
-        if string_to_find != '' and string_to_find in existing_name:
-            new_name = existing_name.replace(string_to_find, string_to_replace)
+        if string_to_find != '' and string_to_find in new_name:
+            new_name = new_name.replace(string_to_find, string_to_replace)
 
     new_name = prefix + new_name + suffix
 
@@ -62,20 +66,11 @@ def get_files_with_extension(folder_path, extension):
         extension: The extension of files you'd like to include in the return
     """
 
-    '''
-    REMINDERS
-
-    This function should only take in strings and return an array
-    No file renaming/copying/moving should happen here
-
-    Make sure to catch and handle errors if the folder doesn't exist!
-    '''
-
     files_with_extension_arr = []
-
     if os.path.isdir(folder_path):
         for file_name in os.listdir(folder_path):
-            if (os.path.isfile(file_name) and 
+            file_path = os.path.join(folder_path, file_name)
+            if (os.path.isfile(file_path) and 
                     file_name.lower().endswith(extension.lower())):
                 files_with_extension_arr.append(file_name)
         return files_with_extension_arr
@@ -96,15 +91,8 @@ def rename_file(logger, existing_name, new_name, copy=False):
         copy: copy instead of rename
     """
 
-    '''
-    REMINDERS
-
-    Copy files using shutil.copy
-    make sure to import it at the top of the file
-    '''
-
-    if existing_name.is_file():
-        if not new_name.isfile():
+    if os.path.isfile(existing_name):
+        if not os.path.isfile(new_name):
             if copy:
                 shutil.copy(existing_name, new_name)
                 logger.info(f'Copied {existing_name} to {new_name}.')
@@ -138,20 +126,6 @@ def rename_files_in_folder(logger, folder_path, extension, string_to_find,
         suffix: a string to append to the end of the file path
         copy: whether to rename/move the file or duplicate/copy it
     """
-
-    '''
-    REMINDERS
-    #
-    This function should:
-        - Find all files in a folder that use a certain extension
-            - Use get_files_with_extension for this
-        - *For each* file...
-            - Determine its new file path
-                - Use get_renamed_file_path for this
-            - Rename or copy the file to the new path
-                - Use rename_file for this
-        - Use the logger instance to document the process of the program
-    '''
 
     if os.path.isdir(folder_path):
         existing_name_arr = get_files_with_extension(folder_path, extension)
