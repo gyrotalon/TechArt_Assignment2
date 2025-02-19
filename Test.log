@@ -1,0 +1,9 @@
+2024-03-02 12:14:54,962 - Test Logger 1.0.0 - INFO - Logger Initiated
+2024-06-03 20:48:24,015 - Test Logger 1.0.0 - INFO - Logger Initiated
+2024-06-03 20:48:39,329 - Test Logger 1.0.0 - INFO - Logger Initiated
+2024-06-03 20:54:21,408 - Test Logger 1.0.0 - INFO - Logger Initiated
+2024-06-03 20:55:55,454 - Test Logger 1.0.0 - INFO - Logger Initiated
+2024-06-21 20:48:55,097 - Test Logger 1.0.0 - INFO - Logger Initiated
+2024-06-21 20:48:55,097 - Test Logger 1.0.0 - WARNING - This would be a logger warning
+2024-06-21 20:48:55,097 - Test Logger 1.0.0 - ERROR - This would be a logger error!!
+2024-06-21 20:48:55,098 - Test Logger 1.0.0 - CRITICAL - This would be a critical log
