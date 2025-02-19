@@ -104,10 +104,10 @@ def rename_file(logger, existing_name, new_name, copy=False):
                 shutil.move(existing_name, new_name)
                 logger.info(f'Renamed {existing_name} to {new_name}')
         else:
-            logger.warning(f'{new_name} already exists ' +
+            logger.error(f'{new_name} already exists ' +
                            'and cannot be used as a new file name.')
     else:
-        logger.warning(f'File {existing_name} does not exist, ' + 
+        logger.error(f'File {existing_name} does not exist, ' + 
                        'thus cannot be renamed.')
 
 def rename_files_in_folder(logger, folder_path, extension, string_to_find,
@@ -140,7 +140,7 @@ def rename_files_in_folder(logger, folder_path, extension, string_to_find,
             existing_name_path = os.path.join(folder_path, existing_name)
             rename_file(logger, existing_name_path, new_name_path, copy)
     else:
-        logger.warning(f'The folder {folder_path} does not exist!')
+        logger.error(f'The folder {folder_path} does not exist!')
 
 
 def main():
