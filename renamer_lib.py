@@ -25,7 +25,7 @@ def get_logger(print_to_screen = False):
 
     return logger.initialize_logger(print_to_screen)
 
-def get_renamed_file_path(logger, existing_name, string_to_find, string_to_replace, 
+def get_renamed_file_path(existing_name, string_to_find, string_to_replace, 
                           prefix, suffix):
     """
     Returns the target file name given an existing file name and 
@@ -38,8 +38,6 @@ def get_renamed_file_path(logger, existing_name, string_to_find, string_to_repla
         prefix: a string to insert at the beginning of the file name
         suffix: a string to append to the end of the file name
     """
-
-    logger.info('Entering function get_renamed_file_path')
 
     new_name = existing_name
 
@@ -62,7 +60,7 @@ def get_renamed_file_path(logger, existing_name, string_to_find, string_to_repla
 
     return new_name
 
-def get_files_with_extension(logger, folder_path, extension):
+def get_files_with_extension(folder_path, extension):
     """
     Returns a collection of files in a given folder with an extension that 
     matches the provided extension
@@ -72,18 +70,13 @@ def get_files_with_extension(logger, folder_path, extension):
         extension: The extension of files you'd like to include in the return
     """
 
-    logger.info('Entering function get_files_with_extension')
-
     files_with_extension_arr = []
-    if os.path.isdir(folder_path):
-        for file_name in os.listdir(folder_path):
-            file_path = os.path.join(folder_path, file_name)
-            ext = os.path.splitext(file_name)[1]
-            if (os.path.isfile(file_path) and ext == '.' + extension):
-                files_with_extension_arr.append(file_name)
-        return files_with_extension_arr
-    else:
-        logger.error(f'The folder {folder_path} does not exist!')
+    for file_name in os.listdir(folder_path):
+        file_path = os.path.join(folder_path, file_name)
+        ext = os.path.splitext(file_name)[1]
+        if (os.path.isfile(file_path) and ext == '.' + extension):
+            files_with_extension_arr.append(file_name)
+    return files_with_extension_arr
 
 def rename_file(logger, existing_name, new_name, copy=False):
     """
@@ -98,8 +91,6 @@ def rename_file(logger, existing_name, new_name, copy=False):
         new_name: full filepath for new name
         copy: copy instead of rename
     """
-
-    logger.info('Entering function rename_file')
 
     if os.path.isfile(existing_name):
         if not os.path.isfile(new_name):
@@ -136,7 +127,8 @@ def rename_files_in_folder(logger, folder_path, extension, string_to_find,
         suffix: a string to append to the end of the file path
         copy: whether to rename/move the file or duplicate/copy it
     """
-    logger.info('Entering function rename_files_in_folder')
+    logger.info('The function rename_files_in_folder will attempt ' + 
+                'to rename files based on provided arguments.')
     logger.warning('Renaming files may cause existing links to break.')
     if extension.count('.') > 1:
         logger.warning('This renamer function may not properly rename ' + 
@@ -144,18 +136,20 @@ def rename_files_in_folder(logger, folder_path, extension, string_to_find,
 
     if os.path.isdir(folder_path):
         logger.info(f'Opening {folder_path} to check for files.')
-        existing_name_arr = get_files_with_extension(logger, folder_path, 
-                                                     extension)
+        existing_name_arr = get_files_with_extension(folder_path, extension)
+        logger.info(f'Files with {extension} extension in {folder_path} ' + 
+                    f'are: {existing_name_arr}')
         for existing_name in existing_name_arr:
             logger.info(f'Found file {existing_name}. Attempting to rename.')
-            new_name = get_renamed_file_path(logger, existing_name, 
-                                             string_to_find, string_to_replace,
-                                             prefix, suffix)
+            new_name = get_renamed_file_path(existing_name, string_to_find, 
+                                             string_to_replace, prefix, suffix)
             new_name_path = os.path.join(folder_path, new_name)
             existing_name_path = os.path.join(folder_path, existing_name)
             rename_file(logger, existing_name_path, new_name_path, copy)
     else:
         logger.error(f'The folder {folder_path} does not exist!')
+
+    logger.info('The function rename_files_in_folder has finished running.')
 
 
 def main():
