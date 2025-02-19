@@ -13,19 +13,18 @@ def get_logger(print_to_screen = False):
 
     return logger.initialize_logger(print_to_screen)
 
-
 def get_renamed_file_path(existing_name, string_to_find, string_to_replace, 
                           prefix, suffix):
     """
-    Returns the target file path given an existing file name and 
+    Returns the target file name given an existing file name and 
     string operations
 
     Args:
         existing_name: the existing file's name
-        string_to_find: a string to find and replace in the existing filename
+        string_to_find: a string to find and replace in the existing file name
         string_to_replace: the string you'd like to replace it with
-        prefix: a string to insert at the beginning of the file path
-        suffix: a string to append to the end of the file path
+        prefix: a string to insert at the beginning of the file name
+        suffix: a string to append to the end of the file name
     """
 
     '''
@@ -38,21 +37,20 @@ def get_renamed_file_path(existing_name, string_to_find, string_to_replace,
         Hint: you may need to check its type...
     '''
 
-    new_name = ''
+    new_name = existing_name
 
     if (isinstance(string_to_find, (list, tuple, set))):
         string_to_find.sort(reverse=True)
         for the_string in string_to_find:
-            if the_string in existing_name:
+            if the_string != '' and string_to_find in existing_name:
                 new_name = existing_name.replace(the_string, string_to_replace)
     else:
-        if string_to_find in existing_name:
+        if string_to_find != '' and string_to_find in existing_name:
             new_name = existing_name.replace(string_to_find, string_to_replace)
 
     new_name = prefix + new_name + suffix
 
     return new_name
-
 
 def get_files_with_extension(folder_path, extension):
     """
@@ -84,7 +82,6 @@ def get_files_with_extension(folder_path, extension):
     else:
         print(f'Folder path {folder_path} does not exist!')
 
-
 def rename_file(logger, existing_name, new_name, copy=False):
     """
     Renames a file if it exists
@@ -96,7 +93,7 @@ def rename_file(logger, existing_name, new_name, copy=False):
         logger: logger instance
         existing_name: full filepath a file that should already exist
         new_name: full filepath for new name
-        copy_mode: copy instead of rename
+        copy: copy instead of rename
     """
 
     '''
@@ -106,9 +103,20 @@ def rename_file(logger, existing_name, new_name, copy=False):
     make sure to import it at the top of the file
     '''
 
-    logger.warning(f'WARNING: File with path {existing_name} does not exist.')
-
-    pass
+    if existing_name.is_file():
+        if not new_name.isfile():
+            if copy:
+                shutil.copy(existing_name, new_name)
+                logger.info(f'Copied {existing_name} to {new_name}.')
+            else:
+                shutil.move(existing_name, new_name)
+                logger.info(f'Renamed {existing_name} to {new_name}')
+        else:
+            logger.warning(f'WARNING: {new_name} already exists ',
+                           'and cannot be used as a new file name.')
+    else:
+        logger.warning(f'WARNING: File {existing_name} does not exist ', 
+                       'thus cannot be renamed.')
 
 def rename_files_in_folder(logger, folder_path, extension, string_to_find,
                            string_to_replace, prefix, suffix, copy=False):
@@ -144,7 +152,17 @@ def rename_files_in_folder(logger, folder_path, extension, string_to_find,
                 - Use rename_file for this
         - Use the logger instance to document the process of the program
     '''
-    pass
+
+    if os.path.isdir(folder_path):
+        existing_name_arr = get_files_with_extension(folder_path, extension)
+        for existing_name in existing_name_arr:
+            new_name = get_renamed_file_path(existing_name, string_to_find,
+                                             string_to_replace, prefix, suffix)
+            new_name_path = os.path.join(folder_path, new_name)
+            existing_name_path = os.path.join(folder_path, existing_name)
+            rename_file(logger, existing_name_path, new_name_path, copy)
+    else:
+        logger.warning(f'The folder {folder_path} does not exist!')
 
 
 def main():
