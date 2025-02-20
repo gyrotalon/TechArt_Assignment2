@@ -135,9 +135,9 @@ def rename_files_in_folder(logger, folder_path, extension, string_to_find,
                 'files based on provided arguments.')
     if not copy:
         logger.warning('Renaming files may cause existing links to break.')
-    if extension.count('.') > 1:
-        logger.warning('This renamer function may not properly rename ' + 
-                       f'files with multiple extensions such as {extension}.')
+    if extension.count('.') >= 1:
+        logger.warning('This renamer may not work if the extension inputted ' +
+                       'has a leading period or is a multiple extension.')
 
     if os.path.isdir(folder_path):
         logger.info(f'Opening {folder_path} to check for files.')
