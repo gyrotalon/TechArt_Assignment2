@@ -25,13 +25,14 @@ def get_logger(print_to_screen = False):
 
     return logger.initialize_logger(print_to_screen)
 
-def get_renamed_file_path(existing_name, string_to_find, string_to_replace, 
-                          prefix, suffix):
+def get_renamed_file_path(existing_name, string_to_find, 
+                          string_to_replace, prefix, suffix):
     """
     Returns the target file name given an existing file name and 
     string operations
 
     Args:
+        logger: logger instance
         existing_name: the existing file's name
         string_to_find: a string to find and replace in the existing file name
         string_to_replace: the string you'd like to replace it with
@@ -41,24 +42,25 @@ def get_renamed_file_path(existing_name, string_to_find, string_to_replace,
 
     new_name = existing_name
 
-    if (isinstance(string_to_find, (list, tuple, set))):
-        if (isinstance(string_to_find, (tuple, set))):
+    try:
+        if (isinstance(string_to_find, str)):
+            if string_to_find != '' and string_to_find in new_name:
+                new_name = new_name.replace(string_to_find, string_to_replace)
+        else:
             string_to_find = list(string_to_find)
-        string_to_find.sort(reverse=True)
-        for the_string in string_to_find:
-            if the_string != '' and the_string in new_name:
-                new_name = new_name.replace(the_string, string_to_replace)
+            string_to_find.sort(reverse=True)
+            for the_string in string_to_find:
+                if the_string != '' and the_string in new_name:
+                    new_name = new_name.replace(the_string, string_to_replace)
+        if prefix != '':
+            new_name = prefix + new_name
+        if suffix != '':
+            name_only, ext = os.path.splitext(new_name)
+            new_name = name_only + suffix + ext
+    except TypeError:
+        return
     else:
-        if string_to_find != '' and string_to_find in new_name:
-            new_name = new_name.replace(string_to_find, string_to_replace)
-
-    if prefix != '':
-        new_name = prefix + new_name
-    if suffix != '':
-        name_only, ext = os.path.splitext(new_name)
-        new_name = name_only + suffix + ext
-
-    return new_name
+        return new_name
 
 def get_files_with_extension(folder_path, extension):
     """
@@ -71,10 +73,12 @@ def get_files_with_extension(folder_path, extension):
     """
 
     files_with_extension_arr = []
+    if extension[0] != '.':
+        extension = '.' + extension
     for file_name in os.listdir(folder_path):
         file_path = os.path.join(folder_path, file_name)
         ext = os.path.splitext(file_name)[1]
-        if (os.path.isfile(file_path) and ext == '.' + extension):
+        if (os.path.isfile(file_path) and ext == extension):
             files_with_extension_arr.append(file_name)
     return files_with_extension_arr
 
@@ -135,9 +139,13 @@ def rename_files_in_folder(logger, folder_path, extension, string_to_find,
                 'files based on provided arguments.')
     if not copy:
         logger.warning('Renaming files may cause existing links to break.')
-    if extension.count('.') >= 1:
-        logger.warning('This renamer may not work if the extension inputted ' +
-                       'has a leading period or is a multiple extension.')
+    if(isinstance(extension, str)):
+        if extension.count('.') >= 1 and extension[0] != '.':
+            logger.warning('Multiple extensions are not supported. ABORTING.')
+            return
+    else:
+        logger.warning('Extension input must be a string. ABORTING.')
+        return
 
     if os.path.isdir(folder_path):
         logger.info(f'Opening {folder_path} to check for files.')
@@ -147,7 +155,13 @@ def rename_files_in_folder(logger, folder_path, extension, string_to_find,
         for existing_name in existing_name_arr:
             new_name = get_renamed_file_path(existing_name, string_to_find, 
                                              string_to_replace, prefix, suffix)
-            new_name_path = os.path.join(folder_path, new_name)
+            try:
+                new_name_path = os.path.join(folder_path, new_name)
+            except TypeError:
+                logger.error('string_to_replace, prefix, and suffix must ' + 
+                             'be string type. string_to_find must be string' + 
+                             ' or list/set/tuple of strings. ABORTING.')
+                return
             existing_name_path = os.path.join(folder_path, existing_name)
             rename_file(logger, existing_name_path, new_name_path, copy)
     else:
