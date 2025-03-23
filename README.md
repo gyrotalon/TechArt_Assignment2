@@ -2,10 +2,8 @@
 
 ## Description
 
-This library contains functions for renaming or copying files.
-This was an assignment for my technical art class.
-
-## Getting Started
+* This library contains functions for renaming or copying files. 
+* This was an assignment for my technical art class.
 
 ### Dependencies
 
@@ -17,5 +15,5 @@ Macy (aka Talon, or gyrotalon)
 
 ## Acknowledgments
 
-The logger function was provided by the instructor, Aaron Aikman.
-ELVTR Course: Become a Technical Artist with Aaron Aikman
+* The logger function and testing files were provided by the instructor, Aaron Aikman. 
+* ELVTR Course: Become a Technical Artist with Aaron Aikman
